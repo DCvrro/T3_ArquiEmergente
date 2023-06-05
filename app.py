@@ -43,6 +43,21 @@ def getAdminByUser():
         exception("Error al obtener los datos (Admin por nombre)")
         return jsonify({"msg": "Error"}), 500
 
+@app.route("/api/findadmin", methods = ['GET'])
+def findAdmin():
+    try:
+        username = request.args['username']
+        password = request.args['password']
+        admin = Admin.query.filter_by(username = username, password = password).first()
+
+        if admin is None:
+            return jsonify({"msg": "No existe el admin con ese Username"}), 404
+        else:
+            return jsonify(admin.serialize()), 200
+    
+    except Exception:
+        exception("Error al obtener los datos (Admin por nombre)")
+        return jsonify({"msg": "Error"}), 500
 
 def test_connection():
     conn = None
