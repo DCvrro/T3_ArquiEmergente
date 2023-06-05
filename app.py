@@ -33,9 +33,11 @@ def getAdminByUser():
     try:
         username = request.args['username']
         admin = Admin.query.filter_by(username = username).first()
+
         if admin is None:
             return jsonify({"msg": "No existe el admin con ese Username"}), 404
-        return jsonify(admin.serialize()), 200
+        else:
+            return jsonify(admin.serialize()), 200
     
     except Exception:
         exception("Error al obtener los datos (Admin por nombre)")
