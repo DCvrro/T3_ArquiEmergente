@@ -16,6 +16,8 @@ def home():
 @app.route("/api/admin")
 def getAdmin():
     admin = Admin.query.filter_by(username='admin').first()
+    adminList = Admin.query.all()
+    print(adminList)
     return admin.username + " " + str(admin)
 
 def test_connection():
