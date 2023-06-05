@@ -92,4 +92,4 @@ def addValues():
 
 if __name__ == "__main__":
     createDB()
-    addValues()
+    #addValues()
