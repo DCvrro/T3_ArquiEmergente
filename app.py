@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, redirect, request, render_template, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import join 
 from models import db, Admin , Company, Location, Sensor, SensorData
@@ -10,8 +11,39 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///D:/Universidad/ArquiEmergente/T3_ArquiEmergente/database/database.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+login_manager = LoginManager(app)
+app.secret_key = 'key'
 
+@login_manager.user_loader
+def load_user(user_id):
+    return Admin.query.get(int(user_id))
 
+@app.route("/api/login", methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        admin = Admin.query.filter_by(username = username, password = password).first()
+
+        if admin is None:
+            return jsonify({"msg": "No existe el admin con ese Username"}), 404
+        else:
+            login_user(admin)
+            return jsonify(admin.serialize()), 200
+
+    return render_template("login.html")
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('/api/login'))
 @app.route("/", methods=['GET'])
 def home():
     return render_template("index.html")
@@ -87,7 +119,6 @@ def receiveSensorData():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/api/v1/sensor_data', methods=['POST']) #SOLICITADO
 def inser_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_data":[{…}, {….}] }

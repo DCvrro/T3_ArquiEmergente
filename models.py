@@ -15,6 +15,9 @@ class Admin(db.Model):
         return 'User: {} Password: {}'.format(
             self.username,
             self.password)
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
     
     def serialize(self): 
         #return con lops datos  user y password 
@@ -22,6 +25,10 @@ class Admin(db.Model):
             "username": self.username,
             "password": self.password
         }
+    def is_active(self):
+        return True
+    def get_id(self):
+        return self.id
 #creamos la clase Company
 class Company(db.Model):
     __tablename__ = 'Company'
