@@ -6,6 +6,7 @@ POST
 Para poder ingresar informacion a un sensor se hace mediante la siguiente ruta: 
     http://127.0.0.1:4000/api/v1/sensor_data
 y con el siguiente JSON 
+
     {
     "api_key": "api_key_sensor_123",
     "json_data": [
@@ -25,6 +26,7 @@ y con el siguiente JSON
     }
 
 Datos extras para rellenar la Base con más informacion para los sensores. 
+
     {
       "api_key": "abcdef12345",
       "json_data": [
@@ -61,7 +63,7 @@ Datos extras para rellenar la Base con más informacion para los sensores.
       ]
     }
 
-Los regitros de inicio de session son los siguientes:
+Los registros de inicio de sesion son los siguientes:
 
     usuario: admin
-    contraseña: admin 
+    contraseña: admin
