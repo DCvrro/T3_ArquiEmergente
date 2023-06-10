@@ -30,7 +30,7 @@ def login():
             return jsonify({"msg": "No existe el admin con ese Username"}), 404
         else:
             login_user(admin)
-            return jsonify(admin.serialize()), 200
+            return redirect(url_for('dashboard'))
 
     return render_template("login.html")
 
