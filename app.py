@@ -45,7 +45,24 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@app.route('/api/new_company', methods=['GET','POST'])
+@login_required
+def new_company():
+    if request.method == 'POST':
+        company_name = request.form['company_name']
+        company_api_key = request.form['company_api_key']
 
+        company = Company.query.filter_by(company_name = company_name).first()
+
+        if company is None:
+            new_company = Company(company_name, company_api_key)
+            db.session.add(new_company)
+            db.session.commit()
+            return redirect(url_for('visor'))
+        else:
+            return jsonify({"msg": "Ya existe una compañia con ese nombre"}), 404
+
+    return render_template("new_company.html")
 @app.route("/", methods=['GET'])
 def home():
     return render_template("index.html")

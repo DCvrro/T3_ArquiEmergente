@@ -43,6 +43,9 @@ class Company(db.Model):
         return 'Company: {} ApiKey: {}'.format(
             self.company_name,
             self.company_api_key)
+    def __init__(self, company_name, company_api_key):
+        self.company_name = company_name
+        self.company_api_key = company_api_key
     
     def serialize(self): 
         #return con lops datos  user y password 
