@@ -58,24 +58,33 @@ class Location(db.Model):
     location_name = db.Column(db.String(200), unique = True, nullable = False)
     location_country = db.Column(db.String(200), nullable = False)
     location_city = db.Column(db.String(200), nullable = False)
-    location_api_key = db.Column(db.String(200), unique = True, nullable = False)
+    #location_api_key = db.Column(db.String(200), unique = True, nullable = False)
     
-    company = db.relationship('Company', backref='location', lazy=True, primaryjoin='Location.company_id == Company.id')
+    company = db.relationship('Company', backref='Location', lazy=True, primaryjoin='Location.company_id == Company.id')
 
     def __str__(self):
-        return 'Location: {} ApiKey: {} Company: {}'.format(
+        return 'Location: {} Company: {}'.format(
             self.location_name,
-            self.location_api_key,
             self.company.company_name)
-
+#      return 'Location: {} ApiKey: {} Company: {}'.format(
+#            self.location_name,
+#            self.location_api_key,
+#            self.company.company_name)
     
     def serialize(self): 
         #return con lops datos  user y password 
         return {
             "location_name": self.location_name,
-            "location_api_key": self.location_api_key,
             "company_name": self.company.company_name
-        }    
+        } 
+    
+  #      def serialize(self): 
+  #      #return con lops datos  user y password 
+  #      return {
+  #          "location_name": self.location_name,
+  #          "location_api_key": self.location_api_key,
+  #          "company_name": self.company.company_name
+  #      }  
 #Creamos la clase Sensor
 class Sensor(db.Model):
     __tablename__ = 'Sensor'

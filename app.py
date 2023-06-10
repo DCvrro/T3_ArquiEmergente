@@ -30,33 +30,22 @@ def login():
             return jsonify({"msg": "No existe el admin con ese Username"}), 404
         else:
             login_user(admin)
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('visor'))
 
     return render_template("login.html")
 
-@app.route('/dashboard')
+@app.route("/api/visor")
 @login_required
-def dashboard():
-    data = []
-    admins = Admin.query.all()
-    companies = Company.query.all()
-    locations = Location.query.all()
-    sensors = Sensor.query.all()
-    sensorData = SensorData.query.all()
+def visor():
+    return render_template("visor.html")
 
-    data.append(admins)
-    data.append(companies)
-    data.append(locations)
-    data.append(sensors)
-    data.append(sensorData)
-
-    return render_template("dashboard.html",data=data)
-
-@app.route('/logout')
+@app.route('/api/logout', methods=['GET','POST'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('/api/login'))
+    return redirect(url_for('login'))
+
+
 @app.route("/", methods=['GET'])
 def home():
     return render_template("index.html")
