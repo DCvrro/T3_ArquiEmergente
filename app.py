@@ -89,12 +89,7 @@ def receiveSensorData():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/v1/sensor_data', methods=['GET'])
-
-
-
-
-@app.route('/api/v1/sensor_data', methods=['POST'])
+@app.route('/api/v1/sensor_data', methods=['POST']) #SOLICITADO
 def inser_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_data":[{…}, {….}] }
     request_data = request.get_json()
 
@@ -135,6 +130,39 @@ def inser_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_
     db.session.commit()
 
     return jsonify({"message": "Datos de sensor insertados correctamente"}), 201
+
+
+@app.route('/api/v1/sensor_data', methods=['GET'])  #SOLICITADO
+def get_sensor_data():
+    company_api_key = request.args.get('company_api_key')
+    from_timestamp = request.args.get('from')
+    to_timestamp = request.args.get('to')
+    sensor_ids = request.args.get('sensor_ids')
+
+    if not company_api_key:
+        return jsonify({"error": "No se ha enviado la company_api_key"}), 400
+    company = Company.query.filter_by(company_api_key=company_api_key).first()
+
+    if company is None:
+        return jsonify({"error": "API key inválido"}), 400
+    
+    sensor_data = SensorData.query.filter(
+        SensorData.sensor_id.in_(sensor_ids),
+        SensorData.timestamp >= from_timestamp,
+        SensorData.timestamp <= to_timestamp
+    ).all()
+
+    if not sensor_data:
+        return jsonify({"error": "No hay datos de sensores para mostrar"}), 404
+    
+    response_data = {
+        "company_name": company.name,
+        "company_api_key": company.company_api_key,
+        "company_location": company.location,
+        "sensor_data": [data.serialize() for data in sensor_data]
+    }
+
+    return jsonify(response_data), 200
 
 def test_connection():
     conn = None

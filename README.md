@@ -1,15 +1,14 @@
 # T3_ArquiEmergente
  Tarea 3 Arquitectura emergentes, API IoT
 
-
-
-Como acceder a la informacion de un sensor
-    http://127.0.0.1:4000/api/v1/sensor_data?company_api_key=%3Capi_key_123%3E
+POST
     
 Para poder ingresar informacion a un sensor se hace mediante la siguiente ruta: 
     http://127.0.0.1:4000/api/v1/sensor_data
 
     y con el siguiente JSON 
+
+    
     {
     "api_key": "api_key_sensor_123",
     "json_data": [
