@@ -37,7 +37,20 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    data = []
+    admins = Admin.query.all()
+    companies = Company.query.all()
+    locations = Location.query.all()
+    sensors = Sensor.query.all()
+    sensorData = SensorData.query.all()
+
+    data.append(admins)
+    data.append(companies)
+    data.append(locations)
+    data.append(sensors)
+    data.append(sensorData)
+
+    return render_template("dashboard.html",data=data)
 
 @app.route('/logout')
 @login_required
