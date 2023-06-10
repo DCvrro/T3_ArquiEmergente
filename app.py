@@ -1,9 +1,10 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import join 
 from models import db, Admin , Company, Location, Sensor, SensorData
 import sqlite3 as sql
 from logging import exception
-
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///D:/Universidad/ArquiEmergente/T3_ArquiEmergente/database/database.db"
@@ -11,9 +12,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def home():
-    return "Hello, Flask!"
+    return render_template("index.html")
 
 @app.route("/api/admins", methods=['GET']) # el get es para leer lo de la base de datos
 def getAdmin():
@@ -87,6 +88,53 @@ def receiveSensorData():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route('/api/v1/sensor_data', methods=['GET'])
+
+
+
+
+@app.route('/api/v1/sensor_data', methods=['POST'])
+def inser_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_data":[{…}, {….}] }
+    request_data = request.get_json()
+
+    if 'api_key' not in request_data: 
+        return jsonify({"error": "No se ha enviado la api_key"}), 400
+    if 'json_data' not in request_data: 
+        return jsonify({"error": "No se ha enviado el json_data"}), 400
+
+    sensor_api_key = request_data['api_key']
+    sensor = Sensor.query.filter_by(sensor_api_key=sensor_api_key).first()
+    if sensor is None:
+        return jsonify({"error": "API key inválido"}), 400
+    print(request_data['json_data'])
+    for data in request_data['json_data']:
+        if 'timestamp' not in data:
+            return jsonify({"error": "Datos de sensor incompletos, FALTA timestap"}), 400
+        if 'data_column1' not in data:
+            return jsonify({"error": "Datos de sensor incompletos, FALTA data_column1"}), 400
+        if 'data_column2' not in data:
+            return jsonify({"error": "Datos de sensor incompletos, FALTA data_column2"}), 400
+        if 'data_column3' not in data:
+            return jsonify({"error": "Datos de sensor incompletos, FALTA data_column3"}), 400
+
+        timestamp = datetime.fromtimestamp(data['timestamp'])
+        data_column1 = data['data_column1']
+        data_column2 = data['data_column2']
+        data_column3 = data['data_column3']
+
+        sensor_data = SensorData(
+            sensor_id=sensor.id,
+            data_column1=data_column1,
+            data_column2=data_column2,
+            data_column3=data_column3,
+            timestamp=timestamp
+        )
+        db.session.add(sensor_data)
+
+    db.session.commit()
+
+    return jsonify({"message": "Datos de sensor insertados correctamente"}), 201
 
 def test_connection():
     conn = None

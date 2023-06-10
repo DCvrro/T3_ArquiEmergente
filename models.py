@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3 as sql
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -44,33 +45,33 @@ class Company(db.Model):
 class Location(db.Model):
     __tablename__ = 'Location'
     id = db.Column(db.Integer, primary_key = True)
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('Company.id'), nullable=False)
     location_name = db.Column(db.String(200), unique = True, nullable = False)
     location_country = db.Column(db.String(200), nullable = False)
     location_city = db.Column(db.String(200), nullable = False)
     location_api_key = db.Column(db.String(200), unique = True, nullable = False)
     
-    company = db.relationship('Company', backref='Location', lazy=True)
+    company = db.relationship('Company', backref='location', lazy=True, primaryjoin='Location.company_id == Company.id')
 
     def __str__(self):
-        #return con lops datos id, user y password
         return 'Location: {} ApiKey: {} Company: {}'.format(
             self.location_name,
             self.location_api_key,
-            self.company_name)
+            self.company.company_name)
+
     
     def serialize(self): 
         #return con lops datos  user y password 
         return {
             "location_name": self.location_name,
             "location_api_key": self.location_api_key,
-            "company_name": self.company_name
+            "company_name": self.company.company_name
         }    
 #Creamos la clase Sensor
 class Sensor(db.Model):
     __tablename__ = 'Sensor'
     id = db.Column(db.Integer, primary_key = True)
-    location__id = db.Column(db.Integer, db.ForeignKey('Location.id'), nullable = False)
+    location_id = db.Column(db.Integer, db.ForeignKey('Location.id'), nullable = False)
     sensor_id = db.Column(db.Integer, nullable=False)
     sensor_name = db.Column(db.String(255), nullable=False)
     sensor_category = db.Column(db.String(255), nullable=False)
@@ -97,22 +98,22 @@ class Sensor(db.Model):
 #creamos la clase SensorData
 class SensorData(db.Model):
     __tablename__ = 'SensorData'
-    id = db.Column(db.Integer, primary_key = True)
-    sensor_id = db.Column(db.Integer, db.ForeignKey('Sensor.id'), nullable = False)
+    id = db.Column(db.Integer, primary_key=True)
+    sensor_id = db.Column(db.Integer, db.ForeignKey('Sensor.id'), nullable=False)
     data_column1 = db.Column(db.String(255), nullable=False)
     data_column2 = db.Column(db.String(255), nullable=False)
     data_column3 = db.Column(db.String(255), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
     def __str__(self):
-        #return con lops datos id, user y password
-        return 'Sensor: {} Data: {} Timestamp: {}'.format(
-            self.sensor_name,
-            self.sensor_data,
-            self.sensor_timestamp)
-    
-    def serialize(self): 
-        #return con lops datos  user y password 
+        return 'SensorData: {}'.format(self.id)
+
+    def serialize(self):
         return {
-            "sensor_name": self.sensor_name,
-            "sensor_data": self.sensor_data,
-            "sensor_timestamp": self.sensor_timestamp
+            "id": self.id,
+            "sensor_id": self.sensor_id,
+            "data_column1": self.data_column1,
+            "data_column2": self.data_column2,
+            "data_column3": self.data_column3,
+            "timestamp": self.timestamp
         }

@@ -49,6 +49,7 @@ def createDB():
             data_column1 TEXT,
             data_column2 TEXT,
             data_column3 TEXT,
+            timestamp TEXT NOT NULL,
             FOREIGN KEY (sensor_id) REFERENCES Sensor (id)
         )""")
     conn.commit()
@@ -84,12 +85,12 @@ def addValues():
     
     # Agregar datos de sensor
     cursor.execute("""
-        INSERT INTO SensorData (sensor_id, data_column1, data_column2, data_column3) 
-        VALUES (1, 'Value 1', 'Value 2', 'Value 3')
+        INSERT INTO SensorData (sensor_id, data_column1, data_column2, data_column3,timestamp) 
+        VALUES (1, 'Value 1', 'Value 2', 'Value 3',1665219200)
     """)
     conn.commit()
     conn.close()
 
 if __name__ == "__main__":
     createDB()
-    #addValues()
+    addValues()
