@@ -61,6 +61,7 @@ class Location(db.Model):
     location_name = db.Column(db.String(200), unique = True, nullable = False)
     location_country = db.Column(db.String(200), nullable = False)
     location_city = db.Column(db.String(200), nullable = False)
+    location_meta = db.Column(db.String(200), nullable = True)
     #location_api_key = db.Column(db.String(200), unique = True, nullable = False)
     
     company = db.relationship('Company', backref='Location', lazy=True, primaryjoin='Location.company_id == Company.id')
@@ -73,7 +74,14 @@ class Location(db.Model):
 #            self.location_name,
 #            self.location_api_key,
 #            self.company.company_name)
-    
+    def __init__(self, company_id,location_name, location_country, location_city,location_meta):
+        self.company_id = company_id
+        self.location_name = location_name
+        self.location_country = location_country
+        self.location_city = location_city
+        self.location_meta = location_meta
+        
+        #self.location_api_key = location_api_key
     def serialize(self): 
         #return con lops datos  user y password 
         return {

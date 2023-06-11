@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Localizacion</title>
+</head>
+<body>
+    <form action="/api/new_location" method="POST">
+        <label for="company_name">Nombre de Compañia: </label>
+        <input type="text" id="company_name" name="company_name" required><br>
+
+        <label for="location_name">Nombre de Localizacion:</label>
+        <input type="text" id="location_name" name="location_name" required><br>
+
+        <label for="location_country">Pais: </label>
+        <input type="text" id="location_country" name='location_country' required><br>
+
+        <label for="location_city">Ciudad:</label>
+        <input type="text" id="location_city" name="location_city" required><br>
+
+        <label for="location_meta">Comentario:</label>
+        <input type="text" id="location_meta" name="location_meta"><br>
+
+        <input type="submit" value="Crear Localizacion">
+    </form>
+</body>
+</html>

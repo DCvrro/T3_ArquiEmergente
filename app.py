@@ -63,6 +63,36 @@ def new_company():
             return jsonify({"msg": "Ya existe una compañia con ese nombre"}), 404
 
     return render_template("new_company.html")
+
+
+@app.route('/api/new_location', methods=['GET','POST'])
+@login_required
+def new_location():
+    if request.method == 'POST':
+        company_name = request.form['company_name']
+        location_name = request.form['location_name']
+        location_country = request.form['location_country']
+        location_city = request.form['location_city']
+        location_meta = request.form['location_meta']
+
+        company = Company.query.filter_by(company_name = company_name).first()
+
+        if company is None:
+            return jsonify({"msg": "No existe la compañia con ese nombre"}), 404
+        
+        existing_location = Location.query.filter_by(company_id=company.id, location_name=location_name).first()
+
+        if existing_location is not None:
+            return jsonify({"msg": "Ya existe una locacion con ese nombre"}), 404
+        
+        new_location = Location(company.id, location_name, location_country, location_city, location_meta)
+        db.session.add(new_location)
+        db.session.commit()
+        return redirect(url_for('visor'))
+    return render_template("new_location.html")
+
+
+
 @app.route("/", methods=['GET'])
 def home():
     return render_template("index.html")
