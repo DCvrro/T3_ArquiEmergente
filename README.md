@@ -5,8 +5,8 @@ IMPORTANTE:
   REALIZAR UNA VERIFICACION DE AUTENDIDAD. 
 
   Para el caso de insomnia se declara un Basic_Auth, lo cual deberia de ser valido para todo tipo de aplicacion, que posea las siguientes creedenciales.
-  (Esto es solo para el envio de informacion 1)Sensor data POST Y GET)
-  
+  (Esto es solo para el envio de informacion 1.-Sensor data POST Y GET)
+
     USERNAME:admin
     PASSWORD:admin
 
@@ -44,7 +44,7 @@ y con el siguiente JSON
 Datos extras para rellenar la Base con más informacion para los sensores. 
 
     {
-      "api_key": "abcdef12345",
+      "api_key": "api_key_sensor_123",
       "json_data": [
         {
           "timestamp": 1622875200,

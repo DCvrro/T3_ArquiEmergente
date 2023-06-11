@@ -237,15 +237,17 @@ def insert_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json
 
 @app.route('/api/v1/sensor_data', methods=['GET'])  #SOLICITADO
 def get_sensor_data():
-    company_api_key = request.args.get('company_api_key')
-    from_timestamp = request.args.get('from')
-    to_timestamp = request.args.get('to')
-    sensor_ids = request.args.get('sensor_ids')
+
+    request_data = request.get_json()
+    company_api_key = request_data.get('company_api_key')
+    from_timestamp = request_data.get('from')
+    to_timestamp = request_data.get('to')
+    sensor_ids = request_data.get('sensor_ids')
 
     if not company_api_key:
         return jsonify({"error": "No se ha enviado la company_api_key"}), 400
+    
     company = Company.query.filter_by(company_api_key=company_api_key).first()
-
     if company is None:
         return jsonify({"error": "API key inválido"}), 400
     
@@ -259,12 +261,11 @@ def get_sensor_data():
         return jsonify({"error": "No hay datos de sensores para mostrar"}), 404
     
     response_data = {
-        "company_name": company.name,
+        "company_name": company.company_name,
         "company_api_key": company.company_api_key,
-        "company_location": company.location,
         "sensor_data": [data.serialize() for data in sensor_data]
     }
-
+    print(request_data)
     return jsonify(response_data), 200
 
 def test_connection():
