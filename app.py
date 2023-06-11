@@ -236,6 +236,7 @@ def insert_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json
     return jsonify({"message": "Datos del sensor guardados correctamente"}), 200
 
 @app.route('/api/v1/sensor_data', methods=['GET'])  #SOLICITADO
+@basic_auth.required
 def get_sensor_data():
 
     request_data = request.get_json()
