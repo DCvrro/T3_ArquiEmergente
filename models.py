@@ -101,7 +101,6 @@ class Sensor(db.Model):
     __tablename__ = 'Sensor'
     id = db.Column(db.Integer, primary_key = True)
     location_id = db.Column(db.Integer, db.ForeignKey('Location.id'), nullable = False)
-    sensor_id = db.Column(db.Integer, nullable=False)
     sensor_name = db.Column(db.String(255), nullable=False)
     sensor_category = db.Column(db.String(255), nullable=False)
     sensor_meta = db.Column(db.String(255))
@@ -116,7 +115,13 @@ class Sensor(db.Model):
             self.sensor_name,
             self.sensor_api_key,
             self.location_name)
-    
+    def __init__(self, location_id, sensor_name, sensor_category, sensor_meta, sensor_api_key):
+        self.location_id = location_id
+        self.sensor_name = sensor_name
+        self.sensor_category = sensor_category
+        self.sensor_meta = sensor_meta
+        self.sensor_api_key = sensor_api_key
+
     def serialize(self): 
         #return con lops datos  user y password 
         return {
@@ -128,21 +133,23 @@ class Sensor(db.Model):
 class SensorData(db.Model):
     __tablename__ = 'SensorData'
     id = db.Column(db.Integer, primary_key=True)
+    data = db.Column(db.JSON, nullable=False)
     sensor_id = db.Column(db.Integer, db.ForeignKey('Sensor.id'), nullable=False)
-    data_column1 = db.Column(db.String(255), nullable=False)
-    data_column2 = db.Column(db.String(255), nullable=False)
-    data_column3 = db.Column(db.String(255), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+    sensor = db.relationship('Sensor', backref='SensorData', lazy=True)
     def __str__(self):
         return 'SensorData: {}'.format(self.id)
 
     def serialize(self):
         return {
             "id": self.id,
-            "sensor_id": self.sensor_id,
-            "data_column1": self.data_column1,
-            "data_column2": self.data_column2,
-            "data_column3": self.data_column3,
+            "data": self.data,
             "timestamp": self.timestamp
         }
+    
+    def set_data(self, data):
+        self.data = data
+
+    def get_data(self):
+        return self.data

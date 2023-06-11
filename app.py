@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, redirect, request, render_template, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_sqlalchemy import SQLAlchemy
+from flask_basicauth import BasicAuth
 from sqlalchemy import join 
 from models import db, Admin , Company, Location, Sensor, SensorData
 import sqlite3 as sql
@@ -13,6 +14,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 login_manager = LoginManager(app)
 app.secret_key = 'key'
+app.config['BASIC_AUTH_USERNAME'] = 'admin'
+app.config['BASIC_AUTH_PASSWORD'] = 'admin'
+basic_auth = BasicAuth(app)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -47,7 +52,7 @@ def logout():
 
 @app.route('/api/new_company', methods=['GET','POST'])
 @login_required
-def new_company():
+def new_company(): #creamos nuevas compañias
     if request.method == 'POST':
         company_name = request.form['company_name']
         company_api_key = request.form['company_api_key']
@@ -67,7 +72,7 @@ def new_company():
 
 @app.route('/api/new_location', methods=['GET','POST'])
 @login_required
-def new_location():
+def new_location(): #creamos nuevas localizaciones
     if request.method == 'POST':
         company_name = request.form['company_name']
         location_name = request.form['location_name']
@@ -91,8 +96,34 @@ def new_location():
         return redirect(url_for('visor'))
     return render_template("new_location.html")
 
+@app.route('/api/new_sensor', methods=['GET','POST'])
+@login_required
+def new_sensor():
+    if request.method == 'POST':
+        location_id = request.form['location_id']
+        sensor_name = request.form['sensor_name']
+        sensor_category = request.form['sensor_category']
+        sensor_meta = request.form['sensor_meta']
+        sensor_api_key = request.form['sensor_api_key']
 
+        #reviso si existe esa location
+        location = Location.query.get(location_id)
+        if not location:
+            return jsonify({"msg": "No existe la locacion con ese id"}), 404
 
+        sensor = Sensor.query.filter_by(sensor_name = sensor_name).first()
+        if sensor: 
+            return jsonify({"msg": "Ya existe un sensor con ese nombre"}), 404
+
+        key = Sensor.query.filter_by(sensor_api_key = sensor_api_key).first()
+        if key:
+            return jsonify({"msg": "Ya existe un sensor con esa api key"}), 404
+
+        new_sensor = Sensor(location_id, sensor_name, sensor_category, sensor_meta, sensor_api_key)
+        db.session.add(new_sensor)
+        db.session.commit()
+        return redirect(url_for('visor'))
+    return render_template("new_sensor.html")
 @app.route("/", methods=['GET'])
 def home():
     return render_template("index.html")
@@ -170,7 +201,8 @@ def receiveSensorData():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/v1/sensor_data', methods=['POST']) #SOLICITADO
-def inser_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_data":[{…}, {….}] }
+@basic_auth.required
+def insert_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_data":[{…}, {….}] }
     request_data = request.get_json()
 
     if 'api_key' not in request_data: 
@@ -182,35 +214,26 @@ def inser_sensor_data(): # Estructura JSON   {"api_key":<sensor_api_key>, "json_
     sensor = Sensor.query.filter_by(sensor_api_key=sensor_api_key).first()
     if sensor is None:
         return jsonify({"error": "API key inválido"}), 400
-    print(request_data['json_data'])
-    for data in request_data['json_data']:
+    
+    json_data = request_data['json_data']
+    if not isinstance(json_data, list):
+        return jsonify({"error": "json_data debe ser una lista de diccionarios"}), 400
+    
+    for data in json_data:
         if 'timestamp' not in data:
-            return jsonify({"error": "Datos de sensor incompletos, FALTA timestap"}), 400
-        if 'data_column1' not in data:
-            return jsonify({"error": "Datos de sensor incompletos, FALTA data_column1"}), 400
-        if 'data_column2' not in data:
-            return jsonify({"error": "Datos de sensor incompletos, FALTA data_column2"}), 400
-        if 'data_column3' not in data:
-            return jsonify({"error": "Datos de sensor incompletos, FALTA data_column3"}), 400
-
+            return jsonify({"error": "No se ha enviado el timestamp"}), 400
         timestamp = datetime.fromtimestamp(data['timestamp'])
-        data_column1 = data['data_column1']
-        data_column2 = data['data_column2']
-        data_column3 = data['data_column3']
+        variable_data = {key:value for key, value in data.items() if key != 'timestamp'}
 
         sensor_data = SensorData(
             sensor_id=sensor.id,
-            data_column1=data_column1,
-            data_column2=data_column2,
-            data_column3=data_column3,
-            timestamp=timestamp
+            timestamp=timestamp,
         )
+
+        sensor_data.set_data(variable_data)
         db.session.add(sensor_data)
-
     db.session.commit()
-
-    return jsonify({"message": "Datos de sensor insertados correctamente"}), 201
-
+    return jsonify({"message": "Datos del sensor guardados correctamente"}), 200
 
 @app.route('/api/v1/sensor_data', methods=['GET'])  #SOLICITADO
 def get_sensor_data():

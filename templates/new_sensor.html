@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Sensor</title>
+</head>
+<body>
+    <form action='/api/new_sensor' method="POST">
+        <label for="location_id">ID de la Ubicacion</label>
+        <input type="text" id="location_id" name="location_id" required><br>
+
+        <label for="sensor_name">Nombre del Sensor</label>
+        <input type="text" id="sensor_name" name="sensor_name" required><br>
+
+        <label for="sensor_category">Categoria del Sensor</label>
+        <input type="text" id="sensor_category" name="sensor_category" required><br>
+
+        <label for="sensor_meta">Comentario</label>
+        <input type="text" id="sensor_meta" name="sensor_meta"><br>
+
+        <label for="sensor_api_key">Key del Sensor</label>
+        <input type="text" id="sensor_api_key" name="sensor_api_key" required><br>
+
+
+        
+        <input type="submit" value="Crear Sensor">
+    </form>
+</body>
+</html>

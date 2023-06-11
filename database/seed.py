@@ -34,7 +34,6 @@ def createDB():
         CREATE TABLE IF NOT EXISTS Sensor(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             location_id INTEGER NOT NULL,
-            sensor_id TEXT NOT NULL,
             sensor_name TEXT NOT NULL,
             sensor_category TEXT NOT NULL,
             sensor_meta TEXT,
@@ -46,12 +45,10 @@ def createDB():
         CREATE TABLE IF NOT EXISTS SensorData (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             sensor_id INTEGER NOT NULL,
-            data_column1 TEXT,
-            data_column2 TEXT,
-            data_column3 TEXT,
-            timestamp TEXT NOT NULL,
+            data JSON NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (sensor_id) REFERENCES Sensor (id)
-        )""")
+            )""")
     conn.commit()
     conn.close()
 
@@ -79,15 +76,11 @@ def addValues():
     
     # Agregar sensor
     cursor.execute("""
-        INSERT INTO Sensor (location_id, sensor_id, sensor_name, sensor_category, sensor_meta, sensor_api_key) 
-        VALUES (1, 1, 'Sensor A', 'Category A', 'Meta A', 'api_key_sensor_123')
+        INSERT INTO Sensor (location_id, sensor_name, sensor_category, sensor_meta, sensor_api_key) 
+        VALUES (1, 'Sensor A', 'Category A', 'Meta A', 'api_key_sensor_123')
     """)
     
     # Agregar datos de sensor
-    cursor.execute("""
-        INSERT INTO SensorData (sensor_id, data_column1, data_column2, data_column3,timestamp) 
-        VALUES (1, 'Value 1', 'Value 2', 'Value 3',1665219200)
-    """)
     conn.commit()
     conn.close()
 

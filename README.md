@@ -1,5 +1,21 @@
 # T3_ArquiEmergente
  Tarea 3 Arquitectura emergentes, API IoT
+IMPORTANTE:
+  ANTES DE REALIZAR CUALQUIER ENVIO MEDIANTE UNA APLICACION POSTMAN O INSOMNIAC ES NECESARIO
+  REALIZAR UNA VERIFICACION DE AUTENDIDAD. 
+
+  Para el caso de insomnia se declara un Basic_Auth, lo cual deberia de ser valido para todo tipo de aplicacion, que posea las siguientes creedenciales.
+  (Esto es solo para el envio de informacion 1)Sensor data POST Y GET)
+  
+    USERNAME:admin
+    PASSWORD:admin
+
+
+Los registros de inicio de sesion son los siguientes(dentro de la API como usuario. ):
+
+    usuario: admin
+    contraseña: admin
+
 
 POST
     
@@ -63,7 +79,3 @@ Datos extras para rellenar la Base con más informacion para los sensores.
       ]
     }
 
-Los registros de inicio de sesion son los siguientes:
-
-    usuario: admin
-    contraseña: admin
